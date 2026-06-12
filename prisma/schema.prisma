@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Grade {
+  id        String         @id @default(cuid())
+  name      String         @unique
+  students  Student[]
+  records   WeeklyRecord[]
+  createdAt DateTime       @default(now())
+}
+
+model Student {
+  id          String       @id @default(cuid())
+  externalId  String?      @unique
+  name        String
+  gradeId     String
+  grade       Grade        @relation(fields: [gradeId], references: [id], onDelete: Cascade)
+  evaluations Evaluation[]
+  createdAt   DateTime     @default(now())
+}
+
+model Config {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model WeeklyRecord {
+  id          String       @id @default(cuid())
+  gradeId     String
+  grade       Grade        @relation(fields: [gradeId], references: [id], onDelete: Cascade)
+  weekStart   DateTime
+  activity    String?
+  skill       String?
+  evaluations Evaluation[]
+
+  @@unique([gradeId, weekStart])
+}
+
+model Evaluation {
+  id             String       @id @default(cuid())
+  weeklyRecordId String
+  weeklyRecord   WeeklyRecord @relation(fields: [weeklyRecordId], references: [id], onDelete: Cascade)
+  studentId      String
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  monday         Int?
+  tuesday        Int?
+  wednesday      Int?
+  thursday       Int?
+  friday         Int?
+  saturday       Int?
+  sunday         Int?
+
+  @@unique([weeklyRecordId, studentId])
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
