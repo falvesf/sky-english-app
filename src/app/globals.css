@@ -391,6 +391,10 @@ table.legenda-table th[colspan="3"] {
     overflow: visible !important;
   }
 
+  .app-layout, .main-content, .document-container, .table-responsive {
+    display: block !important;
+  }
+
   .document-container {
     box-shadow: none !important;
     padding: 0 !important;
