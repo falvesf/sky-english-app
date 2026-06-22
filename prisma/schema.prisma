@@ -58,6 +58,14 @@ model Evaluation {
   saturday       Int?
   sunday         Int?
 
+  mondayObs      String?
+  tuesdayObs     String?
+  wednesdayObs   String?
+  thursdayObs    String?
+  fridayObs      String?
+  saturdayObs    String?
+  sundayObs      String?
+
   @@unique([weeklyRecordId, studentId])
 }
 

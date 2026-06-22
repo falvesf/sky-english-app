@@ -116,6 +116,38 @@ export async function updateEvaluation(weeklyRecordId: string, studentId: string
   return evaluation
 }
 
+export async function updateEvaluationObs(weeklyRecordId: string, studentId: string, day: string, obs: string) {
+  const obsField = `${day}Obs`;
+  let evaluation = await prisma.evaluation.findUnique({
+    where: {
+      weeklyRecordId_studentId: {
+        weeklyRecordId,
+        studentId
+      }
+    }
+  })
+
+  if (!evaluation) {
+    evaluation = await prisma.evaluation.create({
+      data: {
+        weeklyRecordId,
+        studentId,
+        [obsField]: obs
+      }
+    })
+  } else {
+    evaluation = await prisma.evaluation.update({
+      where: { id: evaluation.id },
+      data: {
+        [obsField]: obs
+      }
+    })
+  }
+
+  revalidatePath("/")
+  return evaluation
+}
+
 export async function importStudents(data: { gradeName: string, studentId: string, studentName: string }[]) {
   for (const row of data) {
     let grade = await prisma.grade.findUnique({ where: { name: row.gradeName } })

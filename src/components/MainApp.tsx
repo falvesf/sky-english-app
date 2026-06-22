@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Settings, Printer, ArrowLeft, ArrowRight, LogOut, User, X, Plus, Menu, ChevronUp, ChevronDown } from "lucide-react"
 import { format, addWeeks, subWeeks, startOfWeek, addDays } from "date-fns"
 import ManageDataModal from "./ManageDataModal"
-import { getGrades, getStudents, getWeeklyRecord, updateWeeklyRecord, updateEvaluation, getSkills, createSkill } from "@/actions"
+import { getGrades, getStudents, getWeeklyRecord, updateWeeklyRecord, updateEvaluation, getSkills, createSkill, updateEvaluationObs } from "@/actions"
 
 export default function MainApp({ teacherName, onSignOut }: { teacherName: string, onSignOut: () => void }) {
   const [currentWeek, setCurrentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 1 })) // Monday start
@@ -129,6 +129,21 @@ export default function MainApp({ teacherName, onSignOut }: { teacherName: strin
     }))
 
     await updateEvaluation(record.id, studentId, day, val)
+  }
+
+  const handleObsChange = async (studentId: string, day: string, obs: string) => {
+    if (!record) return
+
+    const obsField = `${day}Obs`
+    setEvaluations(prev => ({
+      ...prev,
+      [studentId]: {
+        ...prev[studentId],
+        [obsField]: obs
+      }
+    }))
+
+    await updateEvaluationObs(record.id, studentId, day, obs)
   }
 
   const days = ["monday", "tuesday", "wednesday", "thursday", "friday"]
@@ -387,23 +402,50 @@ export default function MainApp({ teacherName, onSignOut }: { teacherName: strin
                     <td className="name-cell">{student.name}</td>
                     {days.map(d => {
                       const evalValue = evaluations[student.id]?.[d]
+                      const obsValue = evaluations[student.id]?.[`${d}Obs`] || ""
                       return (
                         <td 
                           key={d} 
                           style={{ 
                             width: '60px', 
                             background: getBgColor(evalValue),
-                            transition: 'background 0.2s'
+                            transition: 'background 0.2s',
+                            verticalAlign: 'top',
+                            padding: '2px'
                           }}
                         >
-                          <input 
-                            type="number"
-                            min="1" max="5"
-                            className="grade-input"
-                            style={{ color: getTextColor(evalValue) }}
-                            value={evalValue || ""}
-                            onChange={(e) => handleEvalChange(student.id, d, e.target.value)}
-                          />
+                          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '44px' }}>
+                            <input 
+                              type="number"
+                              min="1" max="5"
+                              className="grade-input"
+                              style={{ color: getTextColor(evalValue) }}
+                              value={evalValue || ""}
+                              onChange={(e) => handleEvalChange(student.id, d, e.target.value)}
+                            />
+                            <input 
+                              type="text"
+                              value={obsValue}
+                              onChange={(e) => handleObsChange(student.id, d, e.target.value)}
+                              placeholder="Obs..."
+                              className="no-print"
+                              style={{
+                                fontSize: '10px',
+                                width: '100%',
+                                background: 'transparent',
+                                border: 'none',
+                                borderTop: evalValue ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(0,0,0,0.1)',
+                                textAlign: 'center',
+                                marginTop: 'auto',
+                                color: getTextColor(evalValue)
+                              }}
+                            />
+                            {obsValue && (
+                              <div className="print-only" style={{ display: 'none', fontSize: '9px', borderTop: '1px solid rgba(0,0,0,0.3)', marginTop: '2px', paddingTop: '2px', color: getTextColor(evalValue), wordBreak: 'break-word', textAlign: 'center' }}>
+                                {obsValue}
+                              </div>
+                            )}
+                          </div>
                         </td>
                       )
                     })}
