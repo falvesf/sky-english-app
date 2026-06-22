@@ -399,11 +399,11 @@ export default function MainApp({ teacherName, onSignOut }: { teacherName: strin
                   </th>
                 </tr>
                 <tr>
-                  <th style={{ width: '25%', color: '#673AB7', fontSize: '14px', padding: '6px', background: 'white' }}>NAME</th>
+                  <th className="name-header" style={{ width: '25%', color: '#673AB7', fontSize: '14px', padding: '6px', background: 'white' }}>NAME</th>
                   <th colSpan={5} style={{ color: '#673AB7', fontSize: '14px', padding: '6px', background: 'white' }}>ACTIVITIES</th>
                 </tr>
                 <tr>
-                  <th style={{ background: 'white' }}></th>
+                  <th className="name-header" style={{ background: 'white' }}></th>
                   {days.map((d, idx) => (
                     <th key={d} style={{ fontSize: '12px', padding: '4px', background: 'white' }}>
                       <div>{d.charAt(0).toUpperCase() + d.slice(1)}</div>

@@ -312,6 +312,18 @@ table.main-table th.nav-cell {
   padding: 4px;
 }
 
+table.main-table td.name-cell, table.main-table th.name-header {
+  position: sticky;
+  left: 0;
+  background-color: white !important;
+  z-index: 10;
+  box-shadow: 2px 0 5px -2px rgba(0,0,0,0.2);
+}
+
+table.main-table thead th.name-header {
+  z-index: 21;
+}
+
 table.main-table td.name-cell {
   text-align: left;
   font-weight: 500;
