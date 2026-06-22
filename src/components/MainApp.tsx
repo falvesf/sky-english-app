@@ -437,11 +437,12 @@ export default function MainApp({ teacherName, onSignOut }: { teacherName: strin
                               type="text"
                               inputMode="numeric"
                               className="grade-input"
+                              placeholder="1 a 5"
                               style={{ 
                                 color: evalValue ? getBadgeTextColor(evalValue) : 'inherit',
                                 backgroundColor: evalValue ? '#FFFFFF' : 'transparent',
                                 fontWeight: 'bold', 
-                                fontSize: evalValue ? '9px' : '14px',
+                                fontSize: evalValue ? '9px' : '11px',
                                 padding: evalValue ? '4px 6px' : '4px 0',
                                 lineHeight: '1.2',
                                 borderRadius: '12px',
