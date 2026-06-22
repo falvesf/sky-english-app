@@ -158,9 +158,27 @@ export default function MainApp({ teacherName, onSignOut }: { teacherName: strin
   }
 
   const getTextColor = (val: number | null | undefined) => {
-    if (val === 1 || val === 4 || val === 5) return '#FFFFFF'
-    if (val === 2 || val === 3) return '#000000'
+    if (val === 1) return '#FFFFFF'
+    if (val === 2 || val === 3 || val === 4 || val === 5) return '#000000'
     return 'inherit'
+  }
+
+  const getBadgeTextColor = (val: number | null | undefined) => {
+    if (val === 1) return '#990000' // Darker Red
+    if (val === 2) return '#B45F06' // Darker Orange
+    if (val === 3) return '#BF9000' // Darker Yellow
+    if (val === 4) return '#38761D' // Darker Green
+    if (val === 5) return '#0B5394' // Darker Blue
+    return 'inherit'
+  }
+
+  const getGradeLabel = (val: number | null | undefined) => {
+    if (val === 1) return 'Não consegue'
+    if (val === 2) return 'Dificuldade'
+    if (val === 3) return 'Parcial c/ ajuda'
+    if (val === 4) return 'Pouca ajuda'
+    if (val === 5) return 'Autonomia'
+    return ''
   }
 
   return (
@@ -416,32 +434,73 @@ export default function MainApp({ teacherName, onSignOut }: { teacherName: strin
                         >
                           <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '44px' }}>
                             <input 
-                              type="number"
-                              min="1" max="5"
-                              className="grade-input"
-                              style={{ color: getTextColor(evalValue) }}
-                              value={evalValue || ""}
-                              onChange={(e) => handleEvalChange(student.id, d, e.target.value)}
-                            />
-                            <input 
                               type="text"
+                              inputMode="numeric"
+                              className="grade-input"
+                              style={{ 
+                                color: evalValue ? getBadgeTextColor(evalValue) : 'inherit',
+                                backgroundColor: evalValue ? '#FFFFFF' : 'transparent',
+                                fontWeight: 'bold', 
+                                fontSize: evalValue ? '9px' : '14px',
+                                padding: evalValue ? '4px 6px' : '4px 0',
+                                lineHeight: '1.2',
+                                borderRadius: '12px',
+                                width: evalValue ? '94%' : '100%',
+                                margin: '4px auto',
+                                textAlign: 'center',
+                                boxShadow: evalValue ? '0 1px 3px rgba(0,0,0,0.2)' : 'none',
+                                cursor: 'text'
+                              }}
+                              value={evalValue ? getGradeLabel(evalValue) : ""}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                const digits = val.replace(/[^1-5]/g, '');
+                                if (!digits) {
+                                  handleEvalChange(student.id, d, "");
+                                } else {
+                                  handleEvalChange(student.id, d, digits.slice(-1));
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Backspace' || e.key === 'Delete') {
+                                  handleEvalChange(student.id, d, "");
+                                }
+                              }}
+                              onFocus={(e) => e.target.select()}
+                              onClick={(e) => (e.target as HTMLInputElement).select()}
+                            />
+                            <textarea 
                               value={obsValue}
-                              onChange={(e) => handleObsChange(student.id, d, e.target.value)}
+                              onChange={(e) => {
+                                e.target.style.height = 'auto';
+                                e.target.style.height = e.target.scrollHeight + 'px';
+                                handleObsChange(student.id, d, e.target.value);
+                              }}
                               placeholder="Obs..."
                               className="no-print"
+                              rows={1}
+                              ref={(el) => {
+                                if (el) {
+                                  el.style.height = 'auto';
+                                  el.style.height = el.scrollHeight + 'px';
+                                }
+                              }}
                               style={{
                                 fontSize: '10px',
                                 width: '100%',
                                 background: 'transparent',
                                 border: 'none',
-                                borderTop: evalValue ? '1px solid rgba(255,255,255,0.3)' : '1px solid rgba(0,0,0,0.1)',
-                                textAlign: 'center',
+                                borderTop: evalValue ? (getTextColor(evalValue) === '#FFFFFF' ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(0,0,0,0.2)') : '1px solid rgba(0,0,0,0.1)',
+                                textAlign: 'left',
                                 marginTop: 'auto',
-                                color: getTextColor(evalValue)
+                                color: getTextColor(evalValue),
+                                resize: 'none',
+                                overflow: 'hidden',
+                                padding: '4px'
                               }}
                             />
                             {obsValue && (
-                              <div className="print-only" style={{ display: 'none', fontSize: '9px', borderTop: '1px solid rgba(0,0,0,0.3)', marginTop: '2px', paddingTop: '2px', color: getTextColor(evalValue), wordBreak: 'break-word', textAlign: 'center' }}>
+                              <div className="print-only" style={{ display: 'none', fontSize: '9px', borderTop: evalValue ? (getTextColor(evalValue) === '#FFFFFF' ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(0,0,0,0.2)') : '1px solid rgba(0,0,0,0.1)', marginTop: '2px', paddingTop: '2px', color: getTextColor(evalValue), wordBreak: 'break-word', textAlign: 'left', whiteSpace: 'pre-wrap' }}>
                                 {obsValue}
                               </div>
                             )}
